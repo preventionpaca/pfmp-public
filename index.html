@@ -11,21 +11,34 @@
   </style>
 </head>
 <body>
-  <iframe id="pfmpApp"
-    src="https://script.google.com/a/macros/lycee-les-eucalyptus.org/s/AKfycby6ykCxTxhUjq8FeKoBzgEMj6xzdrjXnBFgOt-1pAw1GfkaAigWMH7jj0EIg_BWpEkmxg/exec?page=suivi-conventions-public&amp;wrapper=1"
-    title="Suivi des PFMP — consultation"></iframe>
+  <iframe id="pfmpApp" title="Suivi des PFMP — consultation"></iframe>
   <script>
   (function(){
     'use strict';
     var frame=document.getElementById('pfmpApp');
-    var host='script.google.com';
-    var path='/a/macros/lycee-les-eucalyptus.org/s/AKfycby6ykCxTxhUjq8FeKoBzgEMj6xzdrjXnBFgOt-1pAw1GfkaAigWMH7jj0EIg_BWpEkmxg/exec';
+    var gas='https://script.google.com/a/macros/lycee-les-eucalyptus.org/s/AKfycby6ykCxTxhUjq8FeKoBzgEMj6xzdrjXnBFgOt-1pAw1GfkaAigWMH7jj0EIg_BWpEkmxg/exec';
+    var allowedPages={
+      'suivi-conventions-public':true,
+      'suivi-conventions-public-famille':true,
+      'suivi-pfmp-classe-public':true,
+      'book-entreprises-public-pfmp':true
+    };
     function allowed(raw){
       try{
         var u=new URL(String(raw||''));
-        return u.protocol==='https:'&&u.hostname===host&&u.pathname===path&&
-          (u.searchParams.get('page')||'').indexOf('suivi-')===0?u:null;
+        if(u.protocol!=='https:'||u.hostname!=='script.google.com'||
+           !allowedPages[u.searchParams.get('page')||''])return null;
+        var target=new URL(gas);
+        u.searchParams.forEach(function(value,key){target.searchParams.append(key,value);});
+        target.searchParams.set('wrapper','1');
+        return target;
       }catch(e){return null;}
+    }
+    function initial(){
+      var requested=new URL(location.href),page=requested.searchParams.get('page');
+      if(!allowedPages[page||''])requested.searchParams.set('page','suivi-conventions-public');
+      requested.protocol='https:';requested.hostname='script.google.com';requested.pathname=new URL(gas).pathname;
+      return allowed(requested.toString());
     }
     window.addEventListener('message',function(ev){
       if(!ev.data||!/^EUC_PFMP_WRAPPER_/.test(String(ev.data.type||'')))return;
@@ -41,6 +54,7 @@
         if(target)frame.src=target.toString();
       }
     });
+    frame.src=initial().toString();
   })();
   </script>
 </body>
