@@ -26,7 +26,8 @@
     function allowed(raw){
       try{
         var u=new URL(String(raw||''));
-        if(u.protocol!=='https:'||u.hostname!=='script.google.com'||
+        if(u.protocol!=='https:'||
+           !(u.hostname==='script.google.com'||/script\.googleusercontent\.com$/i.test(u.hostname))||
            !allowedPages[u.searchParams.get('page')||''])return null;
         var target=new URL(gas);
         u.searchParams.forEach(function(value,key){target.searchParams.append(key,value);});
