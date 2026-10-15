@@ -16,6 +16,8 @@
   (function(){
     'use strict';
     var frame=document.getElementById('pfmpApp');
+    /* Clé du lien Atrium : transmise à chaque page affichée dans le cadre. */
+    var acces=new URL(location.href).searchParams.get('acces')||'';
     var gas='https://script.google.com/a/macros/lycee-les-eucalyptus.org/s/AKfycby6ykCxTxhUjq8FeKoBzgEMj6xzdrjXnBFgOt-1pAw1GfkaAigWMH7jj0EIg_BWpEkmxg/exec';
     var allowedPages={
       'suivi-conventions-public':true,
@@ -32,6 +34,7 @@
            !allowedPages[u.searchParams.get('page')||''])return null;
         var target=new URL(gas);
         u.searchParams.forEach(function(value,key){target.searchParams.append(key,value);});
+        if(acces&&!target.searchParams.has('acces'))target.searchParams.set('acces',acces);
         target.searchParams.set('wrapper','1');
         return target;
       }catch(e){return null;}
