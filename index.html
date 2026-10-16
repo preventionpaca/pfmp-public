@@ -49,7 +49,9 @@
     }
     function initial(){
       var requested=new URL(location.href),page=requested.searchParams.get('page');
-      if(!allowedPages[page||''])requested.searchParams.set('page','suivi-conventions-public');
+      /* Nouvelle page des enseignants par défaut ; les anciennes adresses du suivi y mènent aussi. */
+      var anciennes={'suivi-conventions-public':1,'suivi-conventions-public-famille':1,'suivi-pfmp-classe-public':1};
+      if(!allowedPages[page||'']||anciennes[page]){requested.searchParams.set('page','suivi-pfmp-enseignants');['famille','classe','periode','origin'].forEach(function(k){requested.searchParams.delete(k);});}
       requested.protocol='https:';requested.hostname='script.google.com';requested.pathname=new URL(gas).pathname;
       return allowed(requested.toString());
     }
