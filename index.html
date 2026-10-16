@@ -8,9 +8,14 @@
   <style>
     html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fff}
     iframe{border:0;width:100%;height:100%;display:block}
+    #chargement{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f6faf8;font:16px Arial,sans-serif;color:#16302a;z-index:2}
+    #chargement[hidden]{display:none}
+    #chargement i{width:34px;height:34px;border:4px solid #b9ded6;border-top-color:#07856f;border-radius:50%;animation:t .8s linear infinite}
+    @keyframes t{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
+  <div id="chargement" role="status" aria-live="polite"><i aria-hidden="true"></i><span>Chargement du suivi des PFMP…</span></div>
   <iframe id="pfmpApp" title="Suivi des PFMP — consultation"></iframe>
   <script>
   (function(){
@@ -22,6 +27,7 @@
     var gas='https://script.google.com/a/macros/lycee-les-eucalyptus.org/s/AKfycby6ykCxTxhUjq8FeKoBzgEMj6xzdrjXnBFgOt-1pAw1GfkaAigWMH7jj0EIg_BWpEkmxg/exec';
     var allowedPages={
       'suivi-conventions-public':true,
+      'suivi-pfmp-enseignants':true,
       'suivi-conventions-public-famille':true,
       'suivi-pfmp-classe-public':true,
       'book-entreprises-public-pfmp':true,
@@ -58,10 +64,15 @@
       }
       if(ev.data.type==='EUC_PFMP_WRAPPER_NAVIGATE'){
         var target=allowed(ev.data.url);
-        if(target)frame.src=target.toString();
+        if(target)poser(target.toString());
       }
     });
-    frame.src=initial().toString();
+    /* Indicateur de chargement à chaque page servie dans le cadre. */
+    var attente=document.getElementById('chargement');
+    frame.addEventListener('load',function(){attente.hidden=true;});
+    var poser=function(u){attente.hidden=false;frame.src=u;};
+    window.EUC_PFMP_poser=poser;
+    poser(initial().toString());
   })();
   </script>
 </body>
