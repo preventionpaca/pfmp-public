@@ -53,8 +53,12 @@
       var anciennes={'suivi-conventions-public':1,'suivi-conventions-public-famille':1,'suivi-pfmp-classe-public':1};
       if(!allowedPages[page||'']||anciennes[page]){requested.searchParams.set('page','suivi-pfmp-enseignants');['famille','classe','periode','origin'].forEach(function(k){requested.searchParams.delete(k);});}
       requested.protocol='https:';requested.hostname='script.google.com';requested.pathname=new URL(gas).pathname;
-      return allowed(requested.toString());
+      var t=allowed(requested.toString());
+      /* Observation : origine du clic (ex. atrium-sud.fr), transmise une fois par onglet. */
+      var o=eucOrigine();if(t&&o!==null)t.searchParams.set('orig',o);
+      return t;
     }
+    function eucOrigine(){try{var d=sessionStorage.getItem('eucOrigine');if(d!==null)return null;var o='';try{o=document.referrer?new URL(document.referrer).hostname:'';}catch(e){}sessionStorage.setItem('eucOrigine',o||'-');return o;}catch(e){return null;}}
     window.addEventListener('message',function(ev){
       if(!ev.data||!/^EUC_PFMP_WRAPPER_/.test(String(ev.data.type||'')))return;
       if(ev.origin!=='null'&&
